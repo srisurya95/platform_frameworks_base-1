@@ -179,27 +179,28 @@ public class SignalClusterView extends LinearLayout implements NetworkController
             boolean blockMobile = blockList.contains(SLOT_MOBILE);
             boolean blockWifi = blockList.contains(SLOT_WIFI);
             boolean blockEthernet = blockList.contains(SLOT_ETHERNET);
+            boolean blockRoaming = blockList.contains(SLOT_ROAMING);
+            boolean blockVpn = blockList.contains(SLOT_VPN);
+            boolean blockVolte = blockList.contains(SLOT_VOLTE);
 
-            if (blockAirplane != mBlockAirplane || blockMobile != mBlockMobile
-                    || blockEthernet != mBlockEthernet || blockWifi != mBlockWifi) {
-                mBlockAirplane = blockAirplane;
-                mBlockMobile = blockMobile;
-                mBlockEthernet = blockEthernet;
-                mBlockWifi = blockWifi || mForceBlockWifi;
-                // Re-register to get new callbacks.
-                mNetworkController.removeCallback(this);
-                mNetworkController.addCallback(this);
-            }
-
-        } else if (STATUS_BAR_BATTERY_STYLE.equals(key)) {
+        if (blockAirplane != mBlockAirplane || blockMobile != mBlockMobile
+                || blockEthernet != mBlockEthernet || blockWifi != mBlockWifi || blockRoaming != mBlockRoaming || blockVolte != mBlockVolte || blockVpn != mBlockVpn) {
+            mBlockAirplane = blockAirplane;
+            mBlockMobile = blockMobile;
+            mBlockEthernet = blockEthernet;
+            mBlockWifi = blockWifi || mForceBlockWifi;
+            mBlockRoaming = blockRoaming;
+            mBlockVolte = blockVolte;
+            mBlockVpn = blockVpn;
+            mVpnVisible = mSecurityController.isVpnEnabled() && !mBlockVpn;
+            // Re-register to get new callbacks.
+            mNetworkController.removeCallback(this);
+            mNetworkController.addCallback(this);
+        }
+    } else if (STATUS_BAR_BATTERY_STYLE.equals(key)) {
             final int style = newValue == null ?
                 BatteryMeterDrawableBase.BATTERY_STYLE_PORTRAIT : Integer.parseInt(newValue);
             mNoBattery = style == BatteryMeterDrawableBase.BATTERY_STYLE_HIDDEN;
-            apply();
-        }
-        if (blockVpn != mBlockVpn) {
-            mBlockVpn = blockVpn;
-            mVpnVisible = mSecurityController.isVpnEnabled() && !mBlockVpn;
             apply();
         }
     }
